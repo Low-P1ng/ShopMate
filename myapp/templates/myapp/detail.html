@@ -1,0 +1,146 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}{{ product.name }} - ShopMate{% endblock %}
+
+{% block body %}
+<div class="space-y-6">
+
+    <!-- Breadcrumb Nav -->
+    <nav class="flex items-center gap-2 text-xs font-medium text-slate-500">
+        <a href="{% url 'index' %}" class="hover:text-slate-900 transition-colors">Home</a>
+        <span>/</span>
+        <a href="{% url 'index' %}" class="hover:text-slate-900 transition-colors">Products</a>
+        <span>/</span>
+        <span class="text-slate-900 font-semibold truncate">{{ product.name }}</span>
+    </nav>
+
+    <!-- Main Product Layout Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+        <!-- Product Image (Cols 1-5) -->
+        <div class="lg:col-span-5 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-sm">
+            <div class="aspect-square w-full rounded-xl bg-slate-100 overflow-hidden relative">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover">
+                {% else %}
+                <div class="w-full h-full flex items-center justify-center text-slate-400 font-medium">No Image</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Product Details (Cols 6-8) -->
+        <div class="lg:col-span-4 space-y-5">
+            <div>
+                <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600">Essential Collection</span>
+                <h1 class="text-3xl font-bold tracking-tight text-slate-900 mt-1">{{ product.name }}</h1>
+            </div>
+
+            <!-- Ratings & Reviews -->
+            <div class="flex items-center gap-2 text-sm">
+                <div class="flex text-amber-400">
+                    ★ ★ ★ ★ ☆
+                </div>
+                <span class="text-xs text-slate-500 font-medium">(128 reviews)</span>
+            </div>
+
+            <!-- Price -->
+            <div class="border-y border-slate-200/80 py-4">
+                <div class="flex items-baseline gap-2">
+                    <span class="text-3xl font-bold text-slate-900">₹{{ product.price }}</span>
+
+                    <span class="text-xs text-slate-500 font-medium">Tax included</span>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="space-y-2">
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-900">About this product</h4>
+                <p class="text-sm text-slate-600 leading-relaxed">{{ product.description }}</p>
+            </div>
+        </div>
+
+        <!-- Buy Box Card (Cols 9-12) -->
+        <div class="lg:col-span-3 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm space-y-5">
+            
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-slate-500">Availability</span>
+                {% if product.stock > 0 %}
+                <span class="px-2.5 py-1 text-xs font-semibold bg-emerald-50 text-emerald-700 rounded-full border border-emerald-200/60">In Stock</span>
+                {% else %}
+                <span class="px-2.5 py-1 text-xs font-semibold bg-rose-50 text-rose-700 rounded-full border border-rose-200/60">Out of Stock</span>
+                {% endif %}
+            </div>
+
+            <!-- Quantity Selection -->
+            <div class="space-y-1.5">
+                <label for="select" class="block text-xs font-semibold text-slate-700">Quantity</label>
+                <select id="select" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400 transition-all">
+                    <option value="1" selected>1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+
+            <!-- Shipping Guarantee -->
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+                <div class="flex items-center gap-2 text-xs font-semibold text-slate-800">
+                    <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>Free Shipping Available</span>
+                </div>
+                <p class="text-[11px] text-slate-500 pl-6">Estimated delivery within 2-4 business days.</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-2 pt-2">
+                {% if product.stock > 0 %}
+                <button id="atc" value="{{ product.id }}" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm rounded-xl transition-all shadow-sm active:scale-[0.99] flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                    Add to Cart
+                </button>
+                <a href="{% url 'cart-overview' %}" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm rounded-xl transition-all flex items-center justify-center">
+                    Go to Checkout
+                </a>
+                {% else %}
+                <button disabled class="w-full py-3 bg-slate-200 text-slate-400 font-semibold text-sm rounded-xl cursor-not-allowed">
+                    Currently Unavailable
+                </button>
+                {% endif %}
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- AJAX Add to Cart Script -->
+<script>
+  $(document).on("click", "#atc", function (e) {
+    e.preventDefault();
+    const btn = $(this);
+    const originalText = btn.html();
+    btn.prop("disabled", true).addClass("opacity-75");
+
+    $.ajax({
+      type: "POST",
+      url: '{% url "cart_add" %}',
+      data: {
+        csrfmiddlewaretoken: "{{ csrf_token }}",
+        product_id: btn.val(),
+        product_quantity: $("#select").val(),
+      },
+      success: function (json) {
+        $("#cart-qty").text(json.qty);
+        showToast("Product added to cart!", "success");
+        btn.prop("disabled", false).removeClass("opacity-75").html(originalText);
+      },
+      error: function() {
+        showToast("Could not add product to cart.", "error");
+        btn.prop("disabled", false).removeClass("opacity-75").html(originalText);
+      }
+    });
+  });
+</script>
+{% endblock %}

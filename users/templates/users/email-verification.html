@@ -1,0 +1,10 @@
+Hi {{ user.username }},
+
+Thank you for registering on ShopMate. Please verify your email address to activate your account by clicking the link below:
+
+http://{{ domain }}{% url 'email-verification' uidb64=uid token=token %}
+
+If you did not create an account on ShopMate, please ignore this email.
+
+Best regards,
+The ShopMate Team
